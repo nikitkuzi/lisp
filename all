@@ -1,0 +1,365 @@
+;Определите функци�, во�враща�щу� последний элемент списка.
+(defun returnlast (list1)
+	(print (last list1))
+)
+(returnlast '(1 2 3)) ; => (3)
+(returnlast '(1 2 (3))) ; => ((3))
+(returnlast '(1 2 ())) ; => (NIL)
+(print '2_end)
+
+;6. Определите функци, переводщу список чисел в список соответствующихим названий
+; Не совсем понял, что необходимо делать в этом задании.
+(defun fromNumsToNames (list1)
+	(cond
+ 		(
+ 			(null list1) nil
+ 		)
+ 		(
+ 			(cons
+ 				(write-to-string (car list1))
+ 				(fromNumsToNames (cdr list1))
+ 			)
+ 		)
+ 	)
+)
+(print(fromNumsToNames '(1 2 3))) ; => ("1" "2" "3")
+(print '6_end)
+
+; Определите функци�, осуществл��щу� перестановку двух элементов списка с заданными номерами
+(setf lstt '(1 2 3 4))
+(defun swap (list1 pos1 pos2)
+    (rotatef 
+        (nth pos1 list1) 
+        (nth pos2 list1)
+    )
+)
+(swap lstt 0 3)
+(print lstt)
+(print '14_end)
+
+;Определите функци� (ЛУКОВИЦА n), стро�щу� N-уровневый вло�енный список, элементом которого на самом глубоком уровне �вл�етс� N.
+(defun Луковица (n)
+	(do ((a n)); create variable a with value of n
+		((= n 1) (list a)); break statement
+		(setq a (list a))
+		(setq n (- n 1))))
+(print(Луковица 2))
+(print '19_end)
+
+; Определите функци�, удал��щу� и� списка первое вхо�дение данного элемента на верхнем уровне.
+(defun RemoveFirst(lst elem)
+	(setq a '()); temp list
+	(setq flag '0); checker done or not
+	(dolist (element lst); loop through list
+		(cond
+			((= flag 1); if first element has already been removed
+				(setq a (append a (list element))); append new list
+			)
+			((equalp element elem) 
+				(setq flag '1); if elements are equal change checker and do nothing
+			)
+			(T
+				(setq a (append a (list element))); append new list
+			)
+		)
+	)
+	a; return value
+)
+(print(RemoveFirst '(1 2 3 4 5 5) 5))
+(print '21_end)
+
+; Определите функции, преобра�у�щие список (a b с) к виду (а (b (с))) и наоборот.
+(defun transformToOneList (lst)
+	(cond
+		((null lst); last element
+			nil
+		)
+		((atom (car lst)); if there are no nested lists just add
+			(cons (car lst) (transformToOneList (cdr lst)))
+		)
+		(T; if there are we have to remove them
+			(append (transformToOneList (car lst)) (transformToOneList (cdr lst)))
+		)
+	)
+)
+
+
+(defun transformToNestedList (lst)
+	(cond
+		((null (cdr lst)); to prevent adding nil to the end
+			lst
+		)
+		(T; just loop through the list adding to the end
+			(list (car lst) (transformToNestedList (cdr lst)))
+		)
+	)
+)
+
+(print (transformToOneList '(1 2 3 ((5)) (4))))
+(print (transformToNestedList '(1 2 3)))
+(print '23_end)
+
+; Определите предикат РАВЕНСТВО-МНО�ЕСТВ, провер��щий совпадение двух мно-
+; жеств (не�ависимо от пор�дка следовани� элементов). Подска�ка: напишите
+; функци� УДАЛИТ�, удал��щу� данный элемент и� мно�ества
+(defun RemoveFirst(lst elem) ; from 21 task
+	(setq a '()); temp list
+	(setq flag '0); checker done or not
+	(dolist (element lst); loop through list
+		(cond
+			((= flag 1); if first element has already been removed
+				(setq a (append a (list element))); append new list
+			)
+			((equalp element elem) 
+				(setq flag '1); if elements are equal change checker and do nothing
+			)
+			(T
+				(setq a (append a (list element))); append new list
+			)
+		)
+	)
+	a; return value
+)
+
+(defun equalSet (lst1 lst2)
+	(cond
+		((null lst1)
+			(cond
+				((null lst2); if the first list is empty and so is the second then the are equal
+					T
+				)
+				(T; else not
+					nil
+				)
+			)
+		)
+		((null lst2); if the second one is empty then this means that the first condition was false
+			nil
+		)
+		(T
+			(setq lst2 (RemoveFirst lst2 (car lst1))); trying to remove the first element of the list 1 from the second
+			(setq lst1 (RemoveFirst lst1 (car lst1))); removing the first element
+			(equalSet lst1 lst2)
+		)
+	)
+)
+
+(print(equalSet '(1 2 3) '(1 3 2)))
+(print '34_end)
+
+
+; Определите функци� РА�НОСТ�, формиру�щу� ра�ност� двух мно�еств, т.е.
+; удаляющу� и� первого мно�ества все общие со вторым мно�еством элементы.
+(defun Subtraction(lst1 lst2) ; similar to task 21
+	(dolist (elementInTheSecondList lst2)
+		(setq a '()); temp list
+		(dolist (elementInTheFirstList lst1)
+			(cond
+				((equalp elementInTheFirstList elementInTheSecondList) 
+					; if elements are equal do nothing
+				)
+				(T
+					(setq a (append a (list elementInTheFirstList))); append new list and continue
+				)
+			)
+		)
+		(setq lst1 a)
+	)
+	a; return value
+)
+
+(print(Subtraction '(1 (2) 3) '(1 (2)) ))
+
+(print '40_end)
+
+; Определите функци�, подсчитыва�щу� количество всех вершин данного дерева �аданной высоты.
+(setq ans 0)
+(defun solve (lst n)
+	(setq flag 0); temporary flag for nodes
+	(dolist (elem lst)
+		(cond
+			((< n 1) ; depth
+				(cond
+					((= flag 1)); if node has already been found do nothing
+					(T
+						(setq ans (+ ans 1))
+					)
+				)
+			)
+			((atom elem) ; if current element is the node
+				(setq n (- n 1)); then decrease the depth
+				(setq flag 1); mark found node
+				(setq ans (+ ans 1))
+				
+			)
+			((= flag 1); look deeper 
+				(solve elem n)
+			)
+		)
+	)
+)
+(defun countLeafs(lst n)
+	(solve lst n)
+	ans
+)
+
+(setq tree '(1 
+				(2 
+					(3) (4) (5) (6)
+				) 
+				(7 
+					(8) (9 10) (11
+									(12)
+								)
+				)
+			)
+)
+(print (countLeafs tree 3)); tree, depth
+(print '43_end)
+
+;Предполо�им, что отец и мат� некоторого лица, хран�тс� как �начени� 
+;соответству�щих свойств у символа, обо�нача�щего это лицо. Напишите функци� 
+;РОДИТЕЛИ x), котора� во�вращает в качестве �начени� родителей, и предикат 
+;(СЕСТРЫ-БРАТ�� x1 x2), который истинен в случае, если x1 и x2 � сестры или 
+;брат��, родные или с одним общим родителем.
+(defun setParent(child father mother)
+	(setf (get child 'father) father)
+	(setf (get child 'mother) mother)
+)
+(defun getParent (child)
+	(list
+		(get child 'father)
+		(get child  'mother)
+	)
+)
+(defun siblings(child1 child2)
+	(cond
+		((equalp (getParent child1) (getParent child2))
+			T
+		)
+		((equalp (car (getParent child1)) (car (getParent child2)))
+			T
+		)
+		((equalp (cdr (getParent child1)) (cdr (getParent child2)))
+			T
+		)
+		(T
+			nil
+		)
+	)
+)
+(setParent 'x 'z 'y)
+(setParent 'xx 'm 'n)
+(print (getParent 'x))
+(print (siblings 'x 'xx))
+(print '46_end)
+
+; Определите FUNCALL чере� функционал APPLY.
+(defun func (function &rest arguments)
+	(apply function arguments)
+)
+(print (func '* 1 2 3 4 5))
+(print '1_high_end)
+
+;Определите функционал (APL-APPLY f x), который примен�ет ка�ду� функци� fi списка
+;(f1 f2 ... fn)
+;к соответству�щему элементу списка
+;x = (x1 x2 ... xn)
+;и во�вращает список, сформированный и� ре�ул�татов.
+
+(defun power(n)
+	(* n n)
+)
+(defun increase(n)
+	(+ n 1)
+)
+(defun duplicate(n)
+	(list n n)
+)
+(defun apl-apply(f x)
+	(cond
+		((not (null x))
+			(cons 
+				(funcall (car f) (car x))
+				(apl-apply (cdr f) (cdr x))
+			)
+		)
+	)
+)
+(print (apl-apply '(power increase duplicate) '(10 10 10)))
+(print '3_high_end)
+
+; Определите функционал�ный предикат (НЕКОТОРЫй пред список), 
+;который истинен, когда, �вл��щейс� функционал�ным аргументом 
+;предикат пред истинен хот� бы дл� одного элемента списка список.
+(defun negative(elem)
+	(if (numberp elem)
+		(cond
+			((< elem 0)	T)
+			(T nil)
+		)
+	)
+)
+(defun func(fn lst)
+	(mapcan fn lst)
+)
+(print(func 'negative '(1 2 -3)))
+(print '5_high_end)
+
+;Определите фил�тр (УДАЛИТ�-ЕСЛИ-НЕ пред список), удал��щий и� списка список
+;все элементы, которые не облада�т свойством, наличие которого провер�ет
+;предикат пред.
+
+(defun negative(elem)
+	(if (numberp elem)
+		(cond
+			((< elem 0)	T)
+			(T nil)
+		)
+	)
+)
+(defun deleteIfNot(fn lst)
+	(print (mapcan #'(lambda (x) (if (funcall fn x) (list x) nil)) lst))
+)
+(deleteIfNot 'negative '(1 -2 -3))
+(print '7_high_end)
+
+;Напишите генератор поро�дени� чисел Фибоначчи: 0, 1, 1, 2, 3, 5,
+(defun fib()
+	(let 
+		((a 0) (b 1))
+ 		(lambda () 
+ 			(setq a (+ a b))
+ 			(setq b (- a b))
+		)
+ 	) 
+)
+(setq nextFib (fib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print (funcall nextFib))
+(print '9_high_end)
+
+; Определите фукнционал МНОГОФУН, который испол��ует функции, �вл��щиес�
+; аргументами, по следу�щей схеме:
+; (МНОГОФУН ’(f g ... h) x) ⇔ (LIST (f x) (g x) ... (h x)).
+(defun power(n)
+	(* n n)
+)
+(defun increase(n)
+	(+ n 1)
+)
+(defun duplicate(n)
+	(list n n)
+)
+(defun multifun (fn n)
+	(mapcar #'(lambda (x) (list x (funcall x n))) fn)
+)
+(print (multifun '(power increase duplicate power) 10))
+(print '11_high_end)
