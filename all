@@ -301,7 +301,7 @@
 	)
 )
 (defun func(fn lst)
-	(mapcan fn lst)
+	(reduce #'(lambda (x y) (or x y)) (mapcar fn lst))
 )
 (print(func 'negative '(1 2 -3)))
 (print '5_high_end)
