@@ -38,34 +38,33 @@
 (print '14_end)
 
 ;Определите функцию (ЛУКОВИЦА n), строящую N-уровневый вложенный список, элементом которого на самом глубоком уровне является N.
+(defun solve (n n1)
+	(if (not(= n 0)) 
+		(list (solve (- n 1) n1))
+		n1
+	)
+)
 (defun Луковица (n)
-	(do ((a n)); create variable a with value of n
-		((= n 1) (list a)); break statement
-		(setq a (list a))
-		(setq n (- n 1))))
-(print(Луковица 2))
+	(solve n n)
+)
+(print (Луковица 5))
 (print '19_end)
 
 ; Определите функцию, удаляющую из списка первое вхождение данного элемента на верхнем уровне.
 (defun RemoveFirst(lst elem)
-	(setq a '()); temp list
-	(setq flag '0); checker done or not
-	(dolist (element lst); loop through list
-		(cond
-			((= flag 1); if first element has already been removed
-				(setq a (append a (list element))); append new list
-			)
-			((equalp element elem) 
-				(setq flag '1); if elements are equal change checker and do nothing
-			)
-			(T
-				(setq a (append a (list element))); append new list
-			)
+	(cond
+		((equalp elem (car lst)) (append (cdr lst) nil))
+		((null (car lst)) nil)
+		(T
+			(cons (car lst) (RemoveFirst (cdr lst) elem))
 		)
 	)
-	a; return value
 )
-(print(RemoveFirst '(1 2 3 4 5 5) 5))
+
+(print(RemoveFirst '(1 2 2 3 4 (5)) 10))
+(print(RemoveFirst '(1 2 2 3 4 (5)) 2))
+(print(RemoveFirst '(1 2 2 3 4 (5) (5) ((1))) '(5)))
+
 (print '21_end)
 
 ; Определите функции, преобразующие список (a b с) к виду (а (b (с))) и наоборот.
@@ -102,23 +101,14 @@
 ; Определите предикат РАВЕНСТВО-МНОЖЕСТВ, проверяющий совпадение двух мно-
 ; жеств (независимо от порядка следования элементов). Подсказка: напишите
 ; функцию УДАЛИТЬ, удаляющую данный элемент из множества
-(defun RemoveFirst(lst elem) ; from 21 task
-	(setq a '()); temp list
-	(setq flag '0); checker done or not
-	(dolist (element lst); loop through list
-		(cond
-			((= flag 1); if first element has already been removed
-				(setq a (append a (list element))); append new list
-			)
-			((equalp element elem) 
-				(setq flag '1); if elements are equal change checker and do nothing
-			)
-			(T
-				(setq a (append a (list element))); append new list
-			)
+(defun RemoveFirst(lst elem)
+	(cond
+		((equalp elem (car lst)) (append (cdr lst) nil))
+		((null (car lst)) nil)
+		(T
+			(cons (car lst) (RemoveFirst (cdr lst) elem))
 		)
 	)
-	a; return value
 )
 
 (defun equalSet (lst1 lst2)
@@ -137,70 +127,59 @@
 			nil
 		)
 		(T
-			(setq lst2 (RemoveFirst lst2 (car lst1))); trying to remove the first element of the list 1 from the second
-			(setq lst1 (RemoveFirst lst1 (car lst1))); removing the first element
-			(equalSet lst1 lst2)
+			(equalSet (RemoveFirst lst2 (car lst1)) (RemoveFirst lst1 (car lst1)))
 		)
 	)
 )
 
 (print(equalSet '(1 2 3) '(1 3 2)))
+(print(equalSet '(1) '(2)))
 (print '34_end)
 
 
 ; Определите функцию РАЗНОСТЬ, формирующую разность двух множеств, т.е.
 ; удаляющую из первого множества все общие со вторым множеством элементы.
-(defun Subtraction(lst1 lst2) ; similar to task 21
-	(dolist (elementInTheSecondList lst2)
-		(setq a '()); temp list
-		(dolist (elementInTheFirstList lst1)
-			(cond
-				((equalp elementInTheFirstList elementInTheSecondList) 
-					; if elements are equal do nothing
-				)
-				(T
-					(setq a (append a (list elementInTheFirstList))); append new list and continue
-				)
-			)
+(defun RemoveAll(lst elem)
+	(cond
+		((equalp elem (car lst)) (append (RemoveAll (cdr lst) elem)nil))
+		((null (car lst)) nil)
+		(T
+			(cons (car lst) (RemoveAll (cdr lst) elem))
 		)
-		(setq lst1 a)
 	)
-	a; return value
+)
+(defun Subtraction(lst1 lst2)
+	(cond
+		((null (car lst1)) lst1)
+		((null (car lst2)) lst1)
+		(T
+			(Subtraction (RemoveAll lst1 (car lst2)) (cdr lst2))
+		)
+	)
 )
 
+(print(Subtraction '(1 (2) 3) '(1 (2) 3) ))
 (print(Subtraction '(1 (2) 3) '(1 (2)) ))
-
+(print(Subtraction '(1 (2) 3) '(1 3)))
 (print '40_end)
 
 ; Определите функцию, подсчитывающую количество всех вершин данного дерева заданной высоты.
-(setq ans 0)
 (defun solve (lst n)
-	(setq flag 0); temporary flag for nodes
-	(dolist (elem lst)
-		(cond
-			((< n 1) ; depth
-				(cond
-					((= flag 1)); if node has already been found do nothing
-					(T
-						(setq ans (+ ans 1))
+		(cond 
+			((= n 0) 0)
+			(T
+				(+ 
+					(if (atom (car lst))
+						1
+						(solve (car lst) (- n 1))
+					)
+					(if (atom (cdr lst))
+						0
+						(solve (cdr lst) n)
 					)
 				)
 			)
-			((atom elem) ; if current element is the node
-				(setq n (- n 1)); then decrease the depth
-				(setq flag 1); mark found node
-				(setq ans (+ ans 1))
-				
-			)
-			((= flag 1); look deeper 
-				(solve elem n)
-			)
 		)
-	)
-)
-(defun countLeafs(lst n)
-	(solve lst n)
-	ans
 )
 
 (setq tree '(1 
@@ -214,7 +193,23 @@
 				)
 			)
 )
-(print (countLeafs tree 3)); tree, depth
+(setq tree1 '(1 
+				(2 
+					(3) (4) (5) (6)
+				) 
+				(7 
+				)
+			)
+)
+(setq tree2 '(1 
+				(2 
+					(3) (4) (5) (6)
+				) 
+			)
+)
+(print (solve tree 4)); tree, depth
+(print (solve tree1 3))
+(print (solve tree2 3))
 (print '43_end)
 
 ;Предположим, что отец и мать некоторого лица, хранятся как значения 
